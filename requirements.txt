@@ -6,3 +6,8 @@ reportlab
 django-allauth
 requests
 PyJWT==2.8.0
+django-allauth
+requests
+oauthlib
+cryptography
+psycopg2-binary
