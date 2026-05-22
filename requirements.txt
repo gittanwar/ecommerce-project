@@ -5,3 +5,4 @@ Pillow
 reportlab
 django-allauth
 requests
+PyJWT==2.8.0
