@@ -4,3 +4,4 @@ whitenoise
 Pillow
 reportlab
 django-allauth
+requests
