@@ -1,0 +1,290 @@
+{% extends 'store/base.html' %} {% block title %}Checkout - MyStore{% endblock %} {% block content %}
+<h1>Checkout</h1>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem">
+    <!-- Billing Form -->
+    <div style="background: white; padding: 1.5rem; border-radius: 8px">
+        <h2>Shipping Information</h2>
+        <form method="post" id="checkout-form">
+            {% csrf_token %}
+
+            <div style="margin-bottom: 1rem">
+                <label>Full Name:</label>
+                <input type="text" name="full_name" value="{{ user.get_full_name|default:user.username }}" required style="
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.3rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+          " />
+            </div>
+
+            <div style="margin-bottom: 1rem">
+                <label>Email:</label>
+                <input type="email" name="email" value="{{ user.email }}" required style="
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.3rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+          " />
+            </div>
+
+            <div style="margin-bottom: 1rem">
+                <label>Phone:</label>
+                <input type="tel" name="phone" required style="
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.3rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+          " />
+            </div>
+
+            <div style="margin-bottom: 1rem">
+                <label>Address:</label>
+                <textarea name="address" rows="3" required style="
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.3rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+          "></textarea>
+            </div>
+
+            <div style="margin-bottom: 1rem">
+                <label>City:</label>
+                <input type="text" name="city" required style="
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.3rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+          " />
+            </div>
+
+            <div style="margin-bottom: 1rem">
+                <label>State:</label>
+                <input type="text" name="state" required style="
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.3rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+          " />
+            </div>
+
+            <div style="margin-bottom: 1rem">
+                <label>Pincode:</label>
+                <input type="text" name="pincode" required style="
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.3rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+          " />
+            </div>
+
+            <div style="margin-bottom: 1rem">
+                <label>Payment Method:</label>
+                <select name="payment_method" style="
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.3rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+          ">
+          <option value="COD">💰 Cash on Delivery</option>
+          <option value="mock_payment">💳 Mock Payment (Test)</option>
+        </select>
+            </div>
+
+            <button type="submit" class="btn" style="width: 100%; padding: 0.75rem; font-size: 1rem">
+        Place Order
+      </button>
+        </form>
+    </div>
+
+    <!-- Order Summary with Coupon -->
+    <div style="
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      height: fit-content;
+    ">
+        <h2>Order Summary</h2>
+
+        {% for item in cart_items %}
+        <div style="
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #ddd;
+      ">
+            <span>{{ item.product.name }} x {{ item.quantity }}</span>
+            <span>₹{{ item.subtotal }}</span>
+        </div>
+        {% endfor %}
+
+        <!-- Coupon Section -->
+        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ddd">
+            <h3>Apply Coupon</h3>
+
+            {% if coupon_code %}
+            <div style="
+          margin-bottom: 1rem;
+          padding: 0.8rem;
+          background: #d4edda;
+          color: #155724;
+          border-radius: 4px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        ">
+                <span>✅ Coupon "{{ coupon_code }}" applied! You saved
+          <span>-₹{{ discount }}</span></span>
+                <button onclick="removeCoupon()" style="
+            color: #155724;
+            text-decoration: underline;
+            background: none;
+            border: none;
+            cursor: pointer;
+          ">
+          Remove
+        </button>
+            </div>
+            {% endif %}
+
+            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem">
+                <input type="text" id="coupon_code_input" placeholder="Enter coupon code" style="
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+          " />
+                <button type="button" onclick="applyCoupon()" class="btn" style="padding: 0.5rem 1rem">
+          Apply
+        </button>
+            </div>
+        </div>
+
+        <!-- Totals -->
+        <div style="
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 2px solid #333;
+        font-weight: bold;
+      ">
+            <div style="display: flex; justify-content: space-between">
+                <span>Subtotal:</span>
+                <span>₹{{ total }}</span>
+            </div>
+            {% if discount > 0 %}
+            <div style="display: flex; justify-content: space-between; color: #28a745">
+                <span>Discount:</span>
+                <span>-₹{{ discount }}</span>
+            </div>
+            {% endif %}
+            <div style="
+          display: flex;
+          justify-content: space-between;
+          font-size: 1.2rem;
+          margin-top: 0.5rem;
+          padding-top: 0.5rem;
+          border-top: 1px solid #ddd;
+        ">
+                <span>Total:</span>
+                <span>₹{{ final_total }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === name + "=") {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function applyCoupon() {
+        const couponCode = document.getElementById("coupon_code_input").value;
+        if (!couponCode) {
+            alert("Please enter a coupon code");
+            return;
+        }
+
+        // Create form data
+        const formData = new URLSearchParams();
+        formData.append("coupon_code", couponCode);
+        formData.append("csrfmiddlewaretoken", getCookie("csrftoken"));
+
+        fetch("{% url 'apply_coupon' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: formData.toString(),
+                credentials: "same-origin",
+            })
+            .then((response) => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else {
+                    window.location.reload();
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                window.location.reload();
+            });
+    }
+
+    function removeCoupon() {
+        fetch("{% url 'remove_coupon' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                },
+                credentials: "same-origin",
+            })
+            .then((response) => {
+                window.location.reload();
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                window.location.reload();
+            });
+    }
+</script>
+
+<style>
+    .btn {
+        display: inline-block;
+        background: #1a1a1a;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 4px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .btn:hover {
+        background: #c8a96a;
+        transform: translateY(-2px);
+    }
+</style>
+
+{% endblock %}

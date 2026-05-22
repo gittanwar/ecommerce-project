@@ -1,0 +1,189 @@
+{% extends 'store/base.html' %} {% block title %}Track Order - MyStore{% endblock %} {% block content %}
+
+<div class="track-by-number-container">
+    <div class="track-card">
+        <div class="track-icon">
+            <i class="fas fa-search"></i>
+        </div>
+        <h1>Track Your Order</h1>
+        <p>Enter your Order ID and Email address to track your order</p>
+
+        {% if message %}
+        <div class="error-message">
+            <i class="fas fa-exclamation-circle"></i> {{ message }}
+        </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label><i class="fas fa-hashtag"></i> Order ID</label>
+                <input type="number" name="order_id" placeholder="Enter your order number" required />
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-envelope"></i> Email Address</label>
+                <input type="email" name="email" placeholder="Email used at checkout" required />
+            </div>
+            <button type="submit" class="track-btn">
+        <i class="fas fa-truck"></i> Track Order
+      </button>
+        </form>
+
+        {% if order %}
+        <div class="order-preview" style="margin-top: 2rem">
+            <h3>Order #{{ order.id }}</h3>
+            <p>
+                Status:
+                <span class="status-{{ order.status }}">{{ order.get_status_display }}</span
+        >
+      </p>
+      <a href="{% url 'track_order_detail' order.id %}" class="view-details-btn"
+        >View Full Details →</a
+      >
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  .track-by-number-container {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f5f1ea 0%, #ece7de 100%);
+  }
+
+  .track-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .track-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #c8a96a, #b8954a);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+  }
+
+  .track-icon i {
+    font-size: 2rem;
+    color: white;
+  }
+
+  .track-card h1 {
+    font-family: "Playfair Display", serif;
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .track-card p {
+    color: #666;
+    margin-bottom: 1.5rem;
+  }
+
+  .error-message {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.2rem;
+    text-align: left;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .form-group label i {
+    color: #c8a96a;
+    margin-right: 0.5rem;
+  }
+
+  .form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1.5px solid #ebebeb;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s;
+  }
+
+  .form-group input:focus {
+    outline: none;
+    border-color: #c8a96a;
+  }
+
+  .track-btn {
+    width: 100%;
+    padding: 14px;
+    background: #1a1a1a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .track-btn:hover {
+    background: #c8a96a;
+    transform: translateY(-2px);
+  }
+
+  .order-preview {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1.5rem;
+  }
+
+  .view-details-btn {
+    display: inline-block;
+    margin-top: 0.5rem;
+    color: #c8a96a;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .status-pending {
+    color: #856404;
+  }
+  .status-processing {
+    color: #0c5460;
+  }
+  .status-shipped {
+    color: #004085;
+  }
+  .status-delivered {
+    color: #155724;
+  }
+  .status-cancelled {
+    color: #721c24;
+  }
+</style>
+
+{% endblock %}

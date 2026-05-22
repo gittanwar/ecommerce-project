@@ -1,0 +1,895 @@
+{% extends 'store/base.html' %} {% block title %} Home — MyStore | Modern Living
+{% endblock %} {% block content %}
+
+<style>
+  /* =====================================================
+CATEGORY TABS
+===================================================== */
+
+  .category-tabs-wrapper {
+    margin-bottom: 2rem;
+    overflow-x: auto;
+  }
+
+  .category-tabs {
+    display: flex;
+    gap: 12px;
+    flex-wrap: nowrap;
+    padding-bottom: 10px;
+  }
+
+  .cat-tab {
+    padding: 10px 22px;
+    border: 1px solid #e5e5e5;
+    text-decoration: none;
+    color: #444;
+    border-radius: 40px;
+    white-space: nowrap;
+    transition: 0.3s ease;
+    font-size: 14px;
+    background: white;
+  }
+
+  .cat-tab:hover {
+    background: #111;
+    color: white;
+  }
+
+  .cat-tab.active {
+    background: #111;
+    color: white;
+    border-color: #111;
+  }
+  /* =====================================================
+TOPBAR
+===================================================== */
+
+  .products-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .sec-title {
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  .sec-eyebrow {
+    color: #999;
+    margin-bottom: 5px;
+    font-size: 14px;
+    letter-spacing: 1px;
+  }
+  /* =====================================================
+LAYOUT BUTTONS
+===================================================== */
+
+  .layout-switch {
+    display: flex;
+    gap: 10px;
+  }
+
+  .layout-btn {
+    padding: 10px 18px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+
+  .layout-btn:hover {
+    background: #111;
+    color: white;
+  }
+
+  .layout-btn.active {
+    background: #111;
+    color: white;
+    border-color: #111;
+  }
+  /* =====================================================
+PRODUCT GRID
+===================================================== */
+
+  .products-grid-custom.grid-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 30px;
+  }
+
+  .products-grid-custom.list-view {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+  }
+  /* =====================================================
+PRODUCT CARD
+===================================================== */
+
+  .prod-card {
+    position: relative;
+    background: white;
+    border: 1px solid #eee;
+    transition: 0.3s ease;
+    overflow: hidden;
+  }
+
+  .prod-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  }
+
+  .prod-thumb {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .prod-image {
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+    transition: 0.4s ease;
+  }
+
+  .prod-card:hover .prod-image {
+    transform: scale(1.05);
+  }
+  /* =====================================================
+LIST VIEW
+===================================================== */
+
+  .products-grid-custom.list-view .prod-card {
+    display: flex;
+    gap: 25px;
+    padding: 20px;
+    align-items: center;
+  }
+
+  .products-grid-custom.list-view .prod-thumb {
+    width: 280px;
+    flex-shrink: 0;
+  }
+
+  .products-grid-custom.list-view .prod-image {
+    height: 240px;
+  }
+
+  .products-grid-custom.list-view .prod-content {
+    flex: 1;
+  }
+  /* =====================================================
+FAV BUTTON
+===================================================== */
+
+  .fav-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 42px;
+    height: 42px;
+    border: none;
+    background: white;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .fav-icon {
+    width: 20px;
+    height: 20px;
+    color: #333;
+  }
+  /* =====================================================
+QUICK ACTIONS
+===================================================== */
+
+  .prod-quick {
+    position: absolute;
+    bottom: -100%;
+    left: 0;
+    width: 100%;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.95);
+    transition: 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .prod-card:hover .prod-quick {
+    bottom: 0;
+  }
+
+  .quick-view-btn,
+  .add-to-cart-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s ease;
+    font-weight: 600;
+  }
+
+  .quick-view-btn {
+    background: #f5f5f5;
+  }
+
+  .quick-view-btn:hover {
+    background: #111;
+    color: white;
+  }
+
+  .add-to-cart-btn {
+    background: #111;
+    color: white;
+  }
+
+  .add-to-cart-btn:hover {
+    opacity: 0.9;
+  }
+  /* =====================================================
+PRODUCT CONTENT
+===================================================== */
+
+  .prod-content {
+    padding: 18px;
+  }
+
+  .prod-cat-label {
+    color: #999;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .prod-name-link {
+    text-decoration: none;
+  }
+
+  .prod-name {
+    font-size: 18px;
+    color: #111;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
+  .price-now {
+    font-size: 20px;
+    font-weight: bold;
+    color: #111;
+  }
+
+  .prod-stars {
+    margin-top: 10px;
+    color: #f5a623;
+  }
+  /* =====================================================
+QUICK VIEW MODAL
+===================================================== */
+
+  .qv-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .qv-overlay.active {
+    display: flex;
+  }
+
+  .qv-modal {
+    background: white;
+    width: 100%;
+    max-width: 1100px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .qv-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 42px;
+    height: 42px;
+    border: none;
+    background: #111;
+    color: white;
+    cursor: pointer;
+    z-index: 2;
+  }
+
+  .qv-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .qv-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .qv-info {
+    padding: 40px;
+  }
+
+  .qv-category {
+    color: #999;
+    margin-bottom: 10px;
+  }
+
+  .qv-name {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+
+  .qv-price {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 20px 0;
+  }
+
+  .qv-desc {
+    color: #666;
+    line-height: 1.8;
+  }
+
+  .qv-actions {
+    margin-top: 30px;
+  }
+
+  .qv-qty-row {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+  }
+
+  .qv-qty {
+    display: flex;
+    border: 1px solid #ddd;
+  }
+
+  .qv-qty button {
+    width: 45px;
+    border: none;
+    background: #f5f5f5;
+    cursor: pointer;
+  }
+
+  .qv-qty input {
+    width: 60px;
+    border: none;
+    text-align: center;
+  }
+
+  .qv-cart-btn {
+    flex: 1;
+    padding: 14px;
+    background: #111;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+
+  .qv-detail-link {
+    display: inline-block;
+    margin-top: 20px;
+    color: #111;
+    text-decoration: none;
+  }
+
+  .qv-badges {
+    margin-top: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .qv-badge {
+    padding: 8px 14px;
+    background: #f5f5f5;
+    font-size: 13px;
+  }
+  /* =====================================================
+RESPONSIVE
+===================================================== */
+
+  @media (max-width: 768px) {
+    .qv-body {
+      grid-template-columns: 1fr;
+    }
+    .products-grid-custom.list-view .prod-card {
+      flex-direction: column;
+    }
+    .products-grid-custom.list-view .prod-thumb {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="section">
+  <!-- CATEGORY TABS -->
+  <div class="category-tabs-wrapper">
+    <div class="category-tabs">
+      <a
+        href="{% url 'shop' %}"
+        class="cat-tab {% if not request.GET.category %}active{% endif %}"
+      >
+        All Products
+      </a>
+      {% for category in categories %}
+
+      <a
+        href="?category={{ category.slug }}"
+        class="cat-tab {% if request.GET.category == category.slug %}active{% endif %}"
+      >
+        {{ category.name }}
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- TOPBAR -->
+  <div class="products-topbar">
+    <div>
+      <div class="sec-eyebrow">Handpicked for You</div>
+      <div class="sec-title">Featured Products</div>
+    </div>
+
+    <div class="layout-switch">
+      <button id="gridViewBtn" class="layout-btn active">⬜ Grid</button>
+
+      <button id="listViewBtn" class="layout-btn">☰ List</button>
+    </div>
+  </div>
+
+  {% if search_query %}
+  <p>
+    Search results for:
+    <strong>"{{ search_query }}"</strong>
+  </p>
+  {% endif %}
+
+  <!-- PRODUCTS -->
+  <div id="products-container">
+    {% if products %}
+
+    <div class="products-grid-custom grid-view" id="productsWrapper">
+      {% for product in products %}
+
+      <div class="prod-card" data-product-id="{{ product.id }}">
+        <!-- FAV BTN -->
+        <button
+          class="fav-btn"
+          aria-label="Add to favourites"
+          data-product-id="{{ product.id }}"
+          onclick="toggleFavourite(this, {{ product.id }})"
+        >
+          <svg class="fav-icon" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+
+        <!-- PRODUCT IMAGE -->
+        <div class="prod-thumb">
+          <a href="{% url 'product_detail' product.slug %}">
+            {% if product.image %}
+
+            <img
+              src="{{ product.image.url }}"
+              alt="{{ product.name }}"
+              class="prod-image"
+            />
+
+            {% else %}
+
+            <div
+              style="
+                height: 320px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #f5f5f5;
+              "
+            >
+              No Image
+            </div>
+
+            {% endif %}
+          </a>
+
+          <!-- QUICK ACTIONS -->
+          <div class="prod-quick">
+            <button
+              type="button"
+              class="quick-view-btn"
+              onclick='openQuickView({
+                id: {{ product.id }},
+                name: "{{ product.name|escapejs }}",
+                price: "{{ product.price }}",
+                category: "{{ product.category.name|escapejs }}",
+                description: "{{ product.description|escapejs }}",
+                image: "{% if product.image %}{{ product.image.url }}{% endif %}",
+                slug: "{{ product.slug }}"
+              })'
+            >
+              Quick View
+            </button>
+
+            <form
+              method="post"
+              action="{% url 'add_to_cart' product.id %}"
+              class="add-to-cart-form"
+            >
+              {% csrf_token %}
+
+              <button type="submit" class="add-to-cart-btn">
+                🛒 Add to Cart
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- PRODUCT CONTENT -->
+        <div class="prod-content">
+          <div class="prod-cat-label">{{ product.category.name }}</div>
+
+          <a
+            href="{% url 'product_detail' product.slug %}"
+            class="prod-name-link"
+          >
+            <div class="prod-name">{{ product.name|truncatechars:40 }}</div>
+          </a>
+
+          <div class="prod-pricing">
+            <span class="price-now"> ₹{{ product.price }} </span>
+          </div>
+
+          <div class="prod-stars">★★★★★</div>
+        </div>
+      </div>
+
+      {% endfor %}
+    </div>
+
+    {% else %}
+
+    <div style="text-align: center; padding: 5rem 0">No Products Found</div>
+
+    {% endif %}
+  </div>
+</div>
+
+<!-- QUICK VIEW MODAL -->
+
+<div id="quickViewOverlay" class="qv-overlay" onclick="closeQuickView(event)">
+  <div class="qv-modal">
+    <button class="qv-close" onclick="closeQuickView(null)">✕</button>
+
+    <div class="qv-body">
+      <div class="qv-img-wrap">
+        <img id="qvImage" src="" alt="" class="qv-img" />
+      </div>
+
+      <div class="qv-info">
+        <div class="qv-category" id="qvCategory"></div>
+
+        <h2 class="qv-name" id="qvProductName"></h2>
+
+        <div class="qv-stars">★★★★★</div>
+
+        <div class="qv-price" id="qvPrice"></div>
+
+        <p class="qv-desc" id="qvDesc"></p>
+
+        <div class="qv-actions">
+          <form id="qvCartForm" method="post">
+            {% csrf_token %}
+
+            <div class="qv-qty-row">
+              <div class="qv-qty">
+                <button type="button" onclick="changeQty(-1)">−</button>
+
+                <input
+                  type="number"
+                  id="qvQtyInput"
+                  name="quantity"
+                  value="1"
+                  min="1"
+                />
+
+                <button type="button" onclick="changeQty(1)">+</button>
+              </div>
+
+              <button type="submit" class="qv-cart-btn">🛒 Add to Cart</button>
+            </div>
+          </form>
+
+          <a id="qvDetailLink" href="#" class="qv-detail-link">
+            View Full Details →
+          </a>
+        </div>
+
+        <div class="qv-badges">
+          <span class="qv-badge"> 🚚 Free Shipping </span>
+
+          <span class="qv-badge"> 🔒 Secure Checkout </span>
+
+          <span class="qv-badge"> ↩ Easy Returns </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* =====================================================
+        QUICK VIEW
+        ===================================================== */
+
+  const qvOverlay = document.getElementById("quickViewOverlay");
+
+  function openQuickView(product) {
+    document.getElementById("qvProductName").innerText = product.name;
+    document.getElementById("qvCategory").innerText = product.category;
+    document.getElementById("qvPrice").innerText = "₹" + product.price;
+    document.getElementById("qvDesc").innerText = product.description;
+
+    document.getElementById("qvImage").src = product.image;
+
+    document.getElementById("qvCartForm").action =
+      "/add-to-cart/" + product.id + "/";
+
+    document.getElementById("qvDetailLink").href =
+      "/product/" + product.slug + "/";
+
+    qvOverlay.classList.add("active");
+
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeQuickView(e) {
+    if (e && e.target !== qvOverlay) return;
+
+    qvOverlay.classList.remove("active");
+
+    document.body.style.overflow = "";
+  }
+
+  function changeQty(delta) {
+    let input = document.getElementById("qvQtyInput");
+
+    let newVal = Math.max(1, parseInt(input.value) + delta);
+
+    input.value = newVal;
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      closeQuickView();
+    }
+  });
+
+  /* =====================================================
+    TOAST
+    ===================================================== */
+
+  function showToastMsg(message) {
+    const toast = document.createElement("div");
+
+    toast.innerText = message;
+
+    toast.style.cssText = `
+    position:fixed;
+    bottom:30px;
+    right:30px;
+    background:#111;
+    color:white;
+    padding:14px 22px;
+    z-index:99999;
+    border-radius:10px;
+  `;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+      toast.remove();
+    }, 2000);
+  }
+
+  /* =====================================================
+    CSRF
+    ===================================================== */
+
+  function getCookie(name) {
+    let cookieValue = null;
+
+    if (document.cookie && document.cookie !== "") {
+      const cookies = document.cookie.split(";");
+
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+
+        if (cookie.substring(0, name.length + 1) === name + "=") {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+
+          break;
+        }
+      }
+    }
+
+    return cookieValue;
+  }
+
+  /* =====================================================
+    FAVOURITE
+    ===================================================== */
+
+  function toggleFavourite(btn, productId) {
+    const isAuthenticated = "{{ user.is_authenticated }}" === "True";
+
+    if (!isAuthenticated) {
+      window.location.href = "{% url 'login' %}";
+
+      return;
+    }
+
+    const icon = btn.querySelector(".fav-icon");
+
+    fetch(`/accounts/toggle-favourite/${productId}/`, {
+      method: "POST",
+
+      headers: {
+        "X-CSRFToken": getCookie("csrftoken"),
+        "X-Requested-With": "XMLHttpRequest",
+      },
+    })
+      .then((res) => res.json())
+
+      .then((data) => {
+        if (data.is_favourite) {
+          icon.style.fill = "#e44d26";
+
+          showToastMsg("❤️ Added to favourites");
+        } else {
+          icon.style.fill = "none";
+
+          showToastMsg("💔 Removed from favourites");
+        }
+      });
+  }
+
+  /* =====================================================
+    ADD TO CART
+    ===================================================== */
+
+  document.querySelectorAll(".add-to-cart-form").forEach((form) => {
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+
+      fetch(this.action, {
+        method: "POST",
+
+        body: formData,
+
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      })
+        .then((res) => res.json())
+
+        .then((data) => {
+          if (data.success) {
+            showToastMsg("🛒 Product Added");
+
+            const badge = document.querySelector(".cart-count-badge");
+
+            if (badge) {
+              badge.innerText = data.cart_count;
+            }
+          }
+        });
+    });
+  });
+
+  /* =====================================================
+    QUICK VIEW FORM
+    ===================================================== */
+
+  const qvForm = document.getElementById("qvCartForm");
+
+  if (qvForm) {
+    qvForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+
+      fetch(this.action, {
+        method: "POST",
+
+        body: formData,
+
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      })
+        .then((res) => res.json())
+
+        .then((data) => {
+          if (data.success) {
+            showToastMsg("🛒 Product Added");
+
+            closeQuickView();
+          }
+        });
+    });
+  }
+
+  /* =====================================================
+    LAYOUT SWITCHER
+    ===================================================== */
+
+  const gridBtn = document.getElementById("gridViewBtn");
+
+  const listBtn = document.getElementById("listViewBtn");
+
+  const productsWrapper = document.getElementById("productsWrapper");
+
+  gridBtn.addEventListener("click", () => {
+    productsWrapper.classList.remove("list-view");
+
+    productsWrapper.classList.add("grid-view");
+
+    gridBtn.classList.add("active");
+
+    listBtn.classList.remove("active");
+
+    localStorage.setItem("layout", "grid");
+  });
+
+  listBtn.addEventListener("click", () => {
+    productsWrapper.classList.remove("grid-view");
+
+    productsWrapper.classList.add("list-view");
+
+    listBtn.classList.add("active");
+
+    gridBtn.classList.remove("active");
+
+    localStorage.setItem("layout", "list");
+  });
+
+  window.addEventListener("DOMContentLoaded", () => {
+    const savedLayout = localStorage.getItem("layout");
+
+    if (savedLayout === "list") {
+      productsWrapper.classList.remove("grid-view");
+
+      productsWrapper.classList.add("list-view");
+
+      listBtn.classList.add("active");
+    }
+  });
+</script>
+
+{% endblock %}

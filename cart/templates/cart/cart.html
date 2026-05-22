@@ -1,0 +1,126 @@
+{% extends 'store/base.html' %} {% block title %}Shopping Cart - MyStore{% endblock %} {% block content %}
+<section class="cart">
+    <div class="container">
+        <h1>Shopping Cart</h1>
+
+        {% if cart_items %}
+        <table style="width: 100%; background: white; border-collapse: collapse">
+            <thead>
+                <tr>
+                    <th style="padding: 1rem; text-align: left">Product</th>
+                    <th style="padding: 1rem; text-align: left">Price</th>
+                    <th style="padding: 1rem; text-align: left">Quantity</th>
+                    <th style="padding: 1rem; text-align: left">Subtotal</th>
+                    <th style="padding: 1rem; text-align: left">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart_items %}
+                <tr>
+                    <td style="padding: 1rem">
+                        <div style="display: flex; align-items: center; gap: 1rem">
+                            {% if item.product.image %}
+                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width: 60px; height: 60px; object-fit: cover" /> {% endif %}
+                            <span>{{ item.product.name }}</span>
+                        </div>
+                    </td>
+                    <td style="padding: 1rem">₹{{ item.product.price }}</td>
+                    <td style="padding: 1rem">
+                        <form method="post" action="{% url 'update_cart' item.product.id %}" style="display: flex; gap: 0.5rem">
+                            {% csrf_token %}
+                            <input type="number" name="quantity" value="{{ item.quantity }}" min="0" style="width: 60px; padding: 0.3rem" />
+                            <button type="submit" class="btn-sm">Update</button>
+                        </form>
+                    </td>
+                    <td style="padding: 1rem">
+                        ₹{% if item.subtotal %}{{ item.subtotal }}{% else %}{{ item.get_total }}{% endif %}
+                    </td>
+                    <td style="padding: 1rem">
+                        <a href="{% url 'remove_from_cart' item.product.id %}" class="btn-sm" style="
+                background-color: #dc3545;
+                color: white;
+                padding: 0.3rem 0.8rem;
+                text-decoration: none;
+                border-radius: 4px;
+              ">Remove</a
+            >
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3" style="padding: 1rem; text-align: right">
+            <strong>Total:</strong>
+          </td>
+          <td colspan="2" style="padding: 1rem">
+            <strong>₹{{ total }}</strong>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div
+      style="margin-top: 2rem; display: flex; justify-content: space-between"
+    >
+      <a
+        href="{% url 'product_list' %}"
+        class="btn"
+        style="background-color: #28a745"
+        >Continue Shopping</a
+      >
+      <a
+        href="{% url 'checkout' %}"
+        class="btn"
+        style="background-color: #1a1a1a"
+        >Proceed to Checkout</a
+      >
+    </div>
+
+    {% else %}
+    <div
+      style="
+        text-align: center;
+        padding: 3rem;
+        background: white;
+        border-radius: 8px;
+      "
+    >
+      <h2>Your cart is empty!</h2>
+      <p>Add some products to your cart.</p>
+      <a href="{% url 'shop' %}" class="btn" style="background-color: #28a745"
+        >Start Shopping</a
+      >
+    </div>
+    {% endif %}
+
+    <style>
+      .cart {
+        padding: 3% 0%;
+      }
+      .btn-sm {
+        padding: 5px 12px;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        font-size: 12px;
+        text-decoration: none;
+        display: inline-block;
+      }
+      .btn {
+        padding: 12px 24px;
+        border-radius: 40px;
+        text-decoration: none;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+        opacity: 0.9;
+      }
+    </style>
+  </div>
+</section>
+
+{% endblock %}

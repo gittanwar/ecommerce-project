@@ -1,0 +1,431 @@
+{% extends 'store/base.html' %} {% block title %}Track Order #{{ order.id }} - MyStore{% endblock %} {% block content %}
+
+<div class="track-order-container">
+    <div class="track-header">
+        <h1>Track Your Order</h1>
+        <p>
+            Order #{{ order.id }} • Placed on {{ order.created_at|date:"F d, Y" }}
+        </p>
+    </div>
+
+    <div class="track-content">
+        <!-- Order Status Timeline -->
+        <div class="timeline-section">
+            <h2>Order Status</h2>
+            <div class="timeline">
+                {% for step in timeline %}
+                <div class="timeline-step {% if step.status == order.status %}active{% endif %}">
+                    <div class="timeline-icon">
+                        <i class="fas {{ step.icon }}"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>{{ step.label }}</h3>
+                        <p>{{ step.date|date:"F d, Y H:i" }}</p>
+                    </div>
+                </div>
+                {% if not forloop.last %}
+                <div class="timeline-line {% if forloop.counter < timeline|length and order.status != 'pending' and order.status != 'cancelled' %}completed{% endif %}"></div>
+                {% endif %} {% endfor %}
+            </div>
+        </div>
+
+        <div class="order-details-grid">
+            <!-- Order Summary -->
+            <div class="info-card">
+                <h3><i class="fas fa-info-circle"></i> Order Summary</h3>
+                <div class="info-row">
+                    <span>Order ID:</span>
+                    <strong>#{{ order.id }}</strong>
+                </div>
+                <div class="info-row">
+                    <span>Order Date:</span>
+                    <span>{{ order.created_at|date:"F d, Y H:i" }}</span>
+                </div>
+                <div class="info-row">
+                    <span>Order Status:</span>
+                    <span class="status-badge status-{{ order.status }}">
+            {{ order.get_status_display }}
+          </span>
+                </div>
+                <div class="info-row">
+                    <span>Payment Method:</span>
+                    <span>{% if order.payment_method == 'COD' %}Cash on Delivery{% else %}
+            Online Payment{% endif %}</span
+          >
+        </div>
+        {% if order.tracking_number %}
+        <div class="info-row">
+          <span>Tracking Number:</span>
+                    <span>{{ order.tracking_number }}</span>
+                </div>
+                {% endif %} {% if order.estimated_delivery %}
+                <div class="info-row">
+                    <span>Estimated Delivery:</span>
+                    <span>{{ order.estimated_delivery|date:"F d, Y" }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Shipping Address -->
+            <div class="info-card">
+                <h3><i class="fas fa-map-marker-alt"></i> Shipping Address</h3>
+                <p>{{ order.full_name }}</p>
+                <p>{{ order.address }}</p>
+                <p>{{ order.city }}, {{ order.state }} - {{ order.pincode }}</p>
+                <p>📞 {{ order.phone }}</p>
+                <p>✉️ {{ order.email }}</p>
+            </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="items-card">
+            <h3><i class="fas fa-box"></i> Order Items</h3>
+            <div class="items-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.items.all %}
+                        <tr>
+                            <td>
+                                <div class="product-info">
+                                    {% if item.product.image %}
+                                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="product-thumb" /> {% endif %}
+                                    <span>{{ item.product.name }}</span>
+                                </div>
+                            </td>
+                            <td>{{ item.quantity }}</td>
+                            <td>₹{{ item.price }}</td>
+                            <td>₹{{ item.subtotal }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        {% if order.discount_amount > 0 %}
+                        <tr>
+                            <td colspan="3" class="text-right">Subtotal:</td>
+                            <td>₹{{ order.original_amount }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-right">Discount:</td>
+                            <td class="discount">-₹{{ order.discount_amount }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr class="total-row">
+                            <td colspan="3" class="text-right"><strong>Total:</strong></td>
+                            <td><strong>₹{{ order.total_amount }}</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            {% if order.status == 'pending' %}
+            <a href="{% url 'cancel_order' order.id %}" class="btn-cancel" onclick="return confirm('Are you sure you want to cancel this order?');">
+                <i class="fas fa-times-circle"></i> Cancel Order
+            </a>
+            {% endif %}
+            <a href="{% url 'download_invoice' order.id %}" class="btn-invoice">
+                <i class="fas fa-download"></i> Download Invoice
+            </a>
+            <a href="{% url 'my_orders' %}" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Orders
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .track-order-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    .track-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .track-header h1 {
+        font-family: "Playfair Display", serif;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .timeline-section {
+        background: #fff;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .timeline-section h2 {
+        margin-bottom: 1.5rem;
+        font-size: 1.3rem;
+    }
+    
+    .timeline {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        padding: 1rem 0;
+    }
+    
+    .timeline-step {
+        flex: 1;
+        text-align: center;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .timeline-icon {
+        width: 50px;
+        height: 50px;
+        background: #f0f0f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.2rem;
+        color: #999;
+        transition: all 0.3s;
+    }
+    
+    .timeline-step.active .timeline-icon {
+        background: #c8a96a;
+        color: white;
+    }
+    
+    .timeline-content h3 {
+        font-size: 0.9rem;
+        margin-bottom: 0.2rem;
+    }
+    
+    .timeline-content p {
+        font-size: 0.75rem;
+        color: #999;
+    }
+    
+    .timeline-line {
+        position: absolute;
+        top: 25px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #e0e0e0;
+        z-index: 1;
+    }
+    
+    .timeline-line.completed {
+        background: #c8a96a;
+    }
+    
+    .order-details-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .info-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .info-card h3 {
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+    }
+    
+    .info-card h3 i {
+        color: #c8a96a;
+        margin-right: 0.5rem;
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-processing {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    
+    .status-shipped {
+        background: #cce5ff;
+        color: #004085;
+    }
+    
+    .status-delivered {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .items-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        overflow-x: auto;
+    }
+    
+    .items-card h3 {
+        margin-bottom: 1rem;
+    }
+    
+    .items-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .items-table th,
+    .items-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .items-table th {
+        background: #fafafa;
+        font-weight: 600;
+    }
+    
+    .product-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .product-thumb {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+    
+    .text-right {
+        text-align: right;
+    }
+    
+    .discount {
+        color: #28a745;
+    }
+    
+    .total-row {
+        background: #fafafa;
+        font-weight: bold;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn-cancel,
+    .btn-invoice,
+    .btn-back {
+        padding: 12px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn-cancel {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .btn-cancel:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+    }
+    
+    .btn-invoice {
+        background: #28a745;
+        color: white;
+    }
+    
+    .btn-invoice:hover {
+        background: #218838;
+        transform: translateY(-2px);
+    }
+    
+    .btn-back {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn-back:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+    }
+    
+    @media (max-width: 768px) {
+        .order-details-grid {
+            grid-template-columns: 1fr;
+        }
+        .timeline {
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .timeline-line {
+            display: none;
+        }
+        .timeline-step {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-align: left;
+        }
+        .timeline-icon {
+            margin: 0;
+        }
+    }
+</style>
+
+{% endblock %}

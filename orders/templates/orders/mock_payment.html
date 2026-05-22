@@ -1,0 +1,97 @@
+{% extends 'store/base.html' %} {% block title %}Mock Payment - Testing{% endblock %} {% block content %}
+<div style="
+    max-width: 500px;
+    margin: 0 auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  ">
+    <h1 style="text-align: center; color: #333">💳 Mock Payment Gateway</h1>
+    <p style="text-align: center; color: #666; margin-bottom: 2rem">
+        (Testing Purpose Only)
+    </p>
+
+    <div style="
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+    ">
+        <h3 style="margin-bottom: 1rem">Order Summary</h3>
+        <p><strong>Total Amount:</strong> ₹{{ total }}</p>
+        <p><strong>Name:</strong> {{ order_data.full_name }}</p>
+        <p><strong>Email:</strong> {{ order_data.email }}</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div style="margin-bottom: 1.5rem">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold">Select Payment Status:</label
+      >
+      <select
+        name="payment_status"
+        required
+        style="
+          width: 100%;
+          padding: 0.75rem;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-size: 1rem;
+        "
+      >
+        <option value="success">✅ Success - Payment Successful</option>
+        <option value="failed">❌ Failed - Payment Failed</option>
+      </select>
+    </div>
+
+    <div style="display: grid; gap: 1rem">
+      <button
+        type="submit"
+        name="payment_status"
+        value="success"
+        style="
+          background-color: #28a745;
+          color: white;
+          border: none;
+          padding: 0.75rem;
+          border-radius: 4px;
+          font-size: 1rem;
+          cursor: pointer;
+        "
+      >
+        ✅ Simulate Successful Payment
+      </button>
+
+      <button
+        type="submit"
+        name="payment_status"
+        value="failed"
+        style="
+          background-color: #dc3545;
+          color: white;
+          border: none;
+          padding: 0.75rem;
+          border-radius: 4px;
+          font-size: 1rem;
+          cursor: pointer;
+        "
+      >
+        ❌ Simulate Failed Payment
+      </button>
+    </div>
+  </form>
+
+  <p
+    style="
+      text-align: center;
+      margin-top: 1.5rem;
+      color: #999;
+      font-size: 0.8rem;
+    "
+  >
+    ⚡ This is a mock payment gateway for testing. No real transaction occurs.
+  </p>
+</div>
+{% endblock %}

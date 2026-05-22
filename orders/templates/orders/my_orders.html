@@ -1,0 +1,201 @@
+{% extends 'store/base.html' %} {% block title %}My Orders - MyStore{% endblock %} {% block content %}
+
+<div class="container">
+    <h1>My Orders</h1>
+
+    {% if orders %}
+    <div style="background: white; border-radius: 8px; overflow-x: auto">
+        <table style="width: 100%; border-collapse: collapse">
+            <thead style="background-color: #333; color: white">
+                <tr>
+                    <th style="padding: 1rem">Order ID</th>
+                    <th style="padding: 1rem">Date</th>
+                    <th style="padding: 1rem">Total</th>
+                    <th style="padding: 1rem">Status</th>
+                    <th style="padding: 1rem">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr style="border-bottom: 1px solid #ddd">
+                    <td style="padding: 1rem; text-align: center">#{{ order.id }}</td>
+                    <td style="padding: 1rem; text-align: center">
+                        {{ order.created_at|date:"d M Y" }}
+                    </td>
+                    <td style="padding: 1rem; text-align: center">
+                        ₹{{ order.total_amount }}
+                    </td>
+                    <td style="padding: 1rem; text-align: center">
+                        <span style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; background-color: 
+                            {% if order.status == 'delivered' %}#d4edda; color: #155724
+                            {% elif order.status == 'cancelled' %}#f8d7da; color: #721c24
+                            else %}#d1ecf1; color: #0c5460{% endif %};">
+              {{ order.get_status_display }}
+            </span>
+                    </td>
+                    <td style="padding: 1rem; text-align: center">
+                        <!-- Order Actions with Track Button -->
+                        <div class="order-actions">
+                            <a href="{% url 'track_order' order.id %}" class="btn-track">
+                                <i class="fas fa-truck"></i> Track Order
+                            </a>
+                            <a href="{% url 'order_detail' order.id %}" class="btn-view">View Details</a
+              >
+              {% if order.status == 'pending' %}
+              <a
+                href="{% url 'cancel_order' order.id %}"
+                class="btn-cancel"
+                onclick="return confirm('Cancel this order?');"
+              >
+                Cancel
+              </a> {% endif %}
+                            <a href="{% url 'download_invoice' order.id %}" class="btn-download">Invoice</a
+              >
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div
+    style="
+      text-align: center;
+      padding: 3rem;
+      background: white;
+      border-radius: 8px;
+    "
+  >
+    <h2>No orders yet!</h2>
+    <p>Start shopping to place your first order.</p>
+    <a
+      href="{% url 'product_list' %}"
+      class="btn"
+      style="background-color: #28a745"
+      >Start Shopping</a
+    >
+  </div>
+  {% endif %}
+</div>
+
+<style>
+  /* Container Styles */
+  .container {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .container h1 {
+    font-family: "Playfair Display", serif;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #1a1a1a;
+  }
+
+  /* Order Actions Container */
+  .order-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* Track Order Button */
+  .btn-track {
+    background: #c8a96a;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 12px;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .btn-track:hover {
+    background: #b8954a;
+    transform: translateY(-1px);
+  }
+
+  /* View Details Button */
+  .btn-view {
+    background: #007bff;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 12px;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .btn-view:hover {
+    background: #0056b3;
+    transform: translateY(-1px);
+  }
+
+  /* Cancel Button */
+  .btn-cancel {
+    background: #dc3545;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 12px;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .btn-cancel:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+  }
+
+  /* Download Invoice Button */
+  .btn-download {
+    background: #28a745;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 12px;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .btn-download:hover {
+    background: #218838;
+    transform: translateY(-1px);
+  }
+
+  /* Table Responsive */
+  @media (max-width: 768px) {
+    .container {
+      padding: 1rem;
+    }
+
+    .order-actions {
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .btn-track,
+    .btn-view,
+    .btn-cancel,
+    .btn-download {
+      justify-content: center;
+    }
+  }
+</style>
+
+{% endblock %}

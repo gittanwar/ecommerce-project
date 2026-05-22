@@ -1,0 +1,23 @@
+{% extends 'store/base.html' %} {% block title %}My Profile - MyStore{% endblock %} {% block content %}
+<div class="container">
+    <div style="
+      max-width: 800px;
+      margin: 20px auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    ">
+        <h1>My Profile</h1>
+        <hr />
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Joined:</strong> {{ user.date_joined|date:"F d, Y" }}</p>
+        <p><strong>Last Login:</strong> {{ user.last_login|date:"F d, Y H:i" }}</p>
+
+        <a href="{% url 'product_list' %}" class="btn" style="margin-top: 1rem; background: #49d655">Back to Shop</a
+    >
+  </div>
+</div>
+
+{% endblock %}

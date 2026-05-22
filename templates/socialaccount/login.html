@@ -1,0 +1,61 @@
+{% extends "store/base.html" %} {% block title %}Google Login{% endblock %} {% block content %}
+
+<style>
+    .google-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f8f9ff, #eef1ff);
+    }
+    
+    .google-card {
+        width: 100%;
+        max-width: 420px;
+        background: #fff;
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+    }
+    
+    .google-btn {
+        width: 100%;
+        height: 50px;
+        border: none;
+        background: #111;
+        color: #fff;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    
+    .google-btn:hover {
+        background: #000;
+    }
+</style>
+
+<div class="google-page">
+
+    <div class="google-card">
+
+        <h2>Sign in with Google</h2>
+
+        <p style="color:#666; margin-bottom:20px;">
+            Continue using your Google account
+        </p>
+
+        <form method="post">
+            {% csrf_token %} {{ form.as_p }}
+
+            <button type="submit" class="google-btn">
+        Continue with Google
+      </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

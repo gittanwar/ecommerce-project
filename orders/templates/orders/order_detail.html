@@ -1,0 +1,89 @@
+{% extends 'store/base.html' %} {% block title %}Order #{{ order.id }} - MyStore{% endblock %} {% block content %}
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem">
+    <!-- Order Info -->
+    <div style="background: white; padding: 1.5rem; border-radius: 8px">
+        <h2>Order Information</h2>
+        <p><strong>Order ID:</strong> #{{ order.id }}</p>
+        <p><strong>Date:</strong> {{ order.created_at|date:"F d, Y H:i" }}</p>
+        <p>
+            <strong>Status:</strong>
+            <span style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; background-color: 
+                {% if order.status == 'delivered' %}#d4edda; color: #155724
+                {% elif order.status == 'cancelled' %}#f8d7da; color: #721c24
+                else %}#d1ecf1; color: #0c5460{% endif %};">
+        {{ order.get_status_display }}
+      </span>
+        </p>
+        <p>
+            <strong>Payment Method:</strong> {% if order.payment_method == 'COD' %}💰 Cash on Delivery {% elif order.payment_method == 'mock_payment' %}💳 Mock Payment (Test) {% else %}{{ order.payment_method }}{% endif %}
+        </p>
+        <p><strong>Total Amount:</strong> ₹{{ order.total_amount }}</p>
+    </div>
+
+    <!-- Shipping Info -->
+    <div style="background: white; padding: 1.5rem; border-radius: 8px">
+        <h2>Shipping Information</h2>
+        <p><strong>Name:</strong> {{ order.full_name }}</p>
+        <p><strong>Email:</strong> {{ order.email }}</p>
+        <p><strong>Phone:</strong> {{ order.phone }}</p>
+        <p><strong>Address:</strong> {{ order.address }}</p>
+        <p><strong>City:</strong> {{ order.city }}</p>
+        <p><strong>State:</strong> {{ order.state }}</p>
+        <p><strong>Pincode:</strong> {{ order.pincode }}</p>
+    </div>
+</div>
+
+<!-- Order Items -->
+<div style="
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-top: 2rem;
+  ">
+    <h2>Order Items</h2>
+    <table style="width: 100%; border-collapse: collapse">
+        <thead style="background-color: #f5f5f5">
+            <tr>
+                <th style="padding: 0.75rem; text-align: left">Product</th>
+                <th style="padding: 0.75rem; text-align: center">Quantity</th>
+                <th style="padding: 0.75rem; text-align: right">Price</th>
+                <th style="padding: 0.75rem; text-align: right">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items.all %}
+            <tr style="border-bottom: 1px solid #ddd">
+                <td style="padding: 0.75rem">{{ item.product.name }}</td>
+                <td style="padding: 0.75rem; text-align: center">
+                    {{ item.quantity }}
+                </td>
+                <td style="padding: 0.75rem; text-align: right">₹{{ item.price }}</td>
+                <td style="padding: 0.75rem; text-align: right">
+                    ₹{{ item.subtotal }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr style="font-weight: bold">
+                <td colspan="3" style="padding: 0.75rem; text-align: right">Total:</td>
+                <td style="padding: 0.75rem; text-align: right">
+                    ₹{{ order.total_amount }}
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<!-- Action Buttons -->
+<div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center">
+    <a href="{% url 'my_orders' %}" class="btn">← Back to Orders</a> {% if order.status == 'pending' %}
+    <a href="{% url 'cancel_order' order.id %}" class="btn" style="background-color: #dc3545" onclick="return confirm('Are you sure you want to cancel this order?');">
+    ❌ Cancel Order
+  </a> {% endif %}
+
+    <a href="{% url 'download_invoice' order.id %}" class="btn" style="background-color: #28a745">
+    📄 Download Invoice (PDF)
+  </a>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>New Order Notification</title>
+</head>
+
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px">
+        <h2 style="color: #c8a96a">🔔 New Order Alert!</h2>
+        <p>A new order has been placed on your store.</p>
+
+        <div style="
+          background: #f0f0f0;
+          padding: 15px;
+          border-radius: 8px;
+          margin: 15px 0;
+        ">
+            <p><strong>Order ID:</strong> #{{ order.id }}</p>
+            <p><strong>Customer:</strong> {{ order.full_name }}</p>
+            <p><strong>Amount:</strong> ₹{{ order.total_amount }}</p>
+            <p>
+                <strong>Payment Method:</strong> {% if order.payment_method == 'COD' %}Cash on Delivery{% else %}Online Payment{% endif %}
+            </p>
+        </div>
+
+        <div style="margin: 15px 0">
+            <h3>Order Items:</h3>
+            <ul>
+                {% for item in order.items.all %}
+                <li>
+                    {{ item.product.name }} x {{ item.quantity }} = ₹{{ item.subtotal }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div>
+            <h3>Customer Details:</h3>
+            <p>
+                {{ order.full_name }}<br /> {{ order.address }}<br /> {{ order.city }}, {{ order.state }} - {{ order.pincode }}<br /> Phone: {{ order.phone }}<br /> Email: {{ order.email }}
+            </p>
+        </div>
+
+        <p>
+            <a href="{{ protocol }}://{{ domain }}/admin/orders/order/{{ order.id }}/change/" style="
+            background: #c8a96a;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+          ">
+          View Order in Admin
+        </a>
+        </p>
+
+        <p style="color: #999; font-size: 12px; margin-top: 20px">
+            This is an automated notification. Please do not reply to this email.
+        </p>
+    </div>
+</body>
+
+</html>

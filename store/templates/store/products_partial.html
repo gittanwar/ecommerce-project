@@ -1,0 +1,57 @@
+{% if products %}
+<div class="products-grid-custom">
+    {% for product in products %}
+    <div class="prod-card" data-product-id="{{ product.id }}">
+        <div class="prod-thumb">
+            {% if product.image %}
+            <a href="{% url 'product_detail' product.slug %}" class="prod-link">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="prod-image" />
+            </a>
+            {% else %}
+            <a href="{% url 'product_detail' product.slug %}" class="prod-link">
+                <div class="prod-thumb-bg" style="
+            background: #e8e4dc;
+            height: 290px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          ">
+                    <span style="color: #999">No Image</span>
+                </div>
+            </a>
+            {% endif %}
+
+            <div class="prod-overlay-buttons">
+                <button class="quick-view-btn" data-id="{{ product.id }}" title="Quick View">
+          👁️
+        </button>
+                <button class="wishlist-btn" data-id="{{ product.id }}" title="Add to Wishlist">
+          ❤️
+        </button>
+            </div>
+
+            <div class="prod-quick">
+                <button class="btn-add-cart-ajax" data-id="{{ product.id }}">
+          🛒 Add to Cart
+        </button>
+            </div>
+        </div>
+        <div class="prod-cat-label">{{ product.category.name }}</div>
+        <a href="{% url 'product_detail' product.slug %}" class="prod-name-link">
+            <div class="prod-name">{{ product.name|truncatechars:40 }}</div>
+        </a>
+        <div class="prod-pricing">
+            <span class="price-now">₹{{ product.price }}</span>
+        </div>
+        <div class="prod-stars">★★★★★</div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="no-products-message" style="text-align: center; padding: 3rem">
+    <i class="fas fa-box-open" style="font-size: 3rem; color: #ccc"></i>
+    <p style="margin-top: 1rem; color: #999">
+        No products found in this category.
+    </p>
+</div>
+{% endif %}

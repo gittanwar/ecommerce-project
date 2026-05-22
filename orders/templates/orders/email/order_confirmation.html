@@ -1,0 +1,139 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Order Confirmation</title>
+</head>
+
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333">
+    <div style="
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #eee;
+        border-radius: 10px;
+      ">
+        <!-- Header -->
+        <div style="
+          text-align: center;
+          border-bottom: 2px solid #c8a96a;
+          padding-bottom: 20px;
+          margin-bottom: 20px;
+        ">
+            <h1 style="color: #1a1a1a">MyStore</h1>
+            <p style="color: #c8a96a; font-size: 14px">Premium E-commerce Store</p>
+        </div>
+
+        <!-- Greeting -->
+        <h2>Dear {{ customer_name }},</h2>
+        <p>Thank you for your order! Your order has been placed successfully.</p>
+
+        <!-- Order Details -->
+        <div style="
+          background: #f9f9f9;
+          padding: 15px;
+          border-radius: 8px;
+          margin: 20px 0;
+        ">
+            <h3 style="margin-top: 0">Order Details</h3>
+            <p><strong>Order ID:</strong> #{{ order.id }}</p>
+            <p>
+                <strong>Order Date:</strong> {{ order.created_at|date:"F d, Y H:i" }}
+            </p>
+            <p>
+                <strong>Payment Method:</strong> {% if order.payment_method == 'COD' %}Cash on Delivery{% else %}Online Payment{% endif %}
+            </p>
+            <p><strong>Order Status:</strong> {{ order.get_status_display }}</p>
+        </div>
+
+        <!-- Order Items -->
+        <div style="margin: 20px 0">
+            <h3>Order Items</h3>
+            <table style="width: 100%; border-collapse: collapse">
+                <thead>
+                    <tr style="background: #f0f0f0">
+                        <th style="padding: 10px; text-align: left">Product</th>
+                        <th style="padding: 10px; text-align: center">Quantity</th>
+                        <th style="padding: 10px; text-align: right">Price</th>
+                        <th style="padding: 10px; text-align: right">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items.all %}
+                    <tr style="border-bottom: 1px solid #eee">
+                        <td style="padding: 10px">{{ item.product.name }}</td>
+                        <td style="padding: 10px; text-align: center">
+                            {{ item.quantity }}
+                        </td>
+                        <td style="padding: 10px; text-align: right">
+                            ₹{{ item.price }}
+                        </td>
+                        <td style="padding: 10px; text-align: right">
+                            ₹{{ item.subtotal }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    {% if order.discount_amount > 0 %}
+                    <tr>
+                        <td colspan="3" style="padding: 10px; text-align: right">
+                            Subtotal:
+                        </td>
+                        <td style="padding: 10px; text-align: right">
+                            ₹{{ order.original_amount }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="padding: 10px; text-align: right">
+                            Discount:
+                        </td>
+                        <td style="padding: 10px; text-align: right; color: #28a745">
+                            -₹{{ order.discount_amount }}
+                        </td>
+                    </tr>
+                    {% endif %}
+                    <tr style="background: #f0f0f0; font-weight: bold">
+                        <td colspan="3" style="padding: 10px; text-align: right">
+                            Total:
+                        </td>
+                        <td style="padding: 10px; text-align: right">
+                            ₹{{ order.total_amount }}
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- Shipping Address -->
+        <div style="
+          background: #f9f9f9;
+          padding: 15px;
+          border-radius: 8px;
+          margin: 20px 0;
+        ">
+            <h3 style="margin-top: 0">Shipping Address</h3>
+            <p>
+                {{ order.full_name }}<br /> {{ order.address }}<br /> {{ order.city }}, {{ order.state }} - {{ order.pincode }}<br /> Phone: {{ order.phone }}<br /> Email: {{ order.email }}
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div style="
+          text-align: center;
+          border-top: 1px solid #eee;
+          padding-top: 20px;
+          margin-top: 20px;
+          color: #999;
+          font-size: 12px;
+        ">
+            <p>Thank you for shopping with MyStore!</p>
+            <p>
+                If you have any questions, please contact us at support@mystore.com
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,293 @@
+{% extends 'store/base.html' %} {% block title %}My Favourites - MyStore{% endblock %} {% block content %}
+<div class="section">
+    <h1 class="sec-title" style="text-align: center; margin-bottom: 2rem">
+        My Favourites ❤️
+    </h1>
+
+    {% if favourites %}
+    <div class="products-grid-custom">
+        {% for fav in favourites %}
+        <div class="prod-card" data-product-id="{{ fav.product.id }}">
+            <div class="prod-thumb">
+                <a href="{% url 'product_detail' fav.product.slug %}" class="prod-link">
+          {% if fav.product.image %}
+          <img
+            src="{{ fav.product.image.url }}"
+            alt="{{ fav.product.name }}"
+            class="prod-image"
+          />
+          {% else %}
+          <div
+            class="prod-thumb-bg"
+            style="
+              background: #e8e4dc;
+              height: 290px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            "
+          >
+            <span style="color: #999">No Image</span>
+          </div>
+          {% endif %}
+        </a>
+
+                <div class="prod-quick">
+                    <form method="post" action="{% url 'add_to_cart' fav.product.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="add-to-cart-btn">
+              🛒 Add to Cart
+            </button>
+                    </form>
+                </div>
+            </div>
+            <div class="prod-cat-label">{{ fav.product.category.name }}</div>
+            <a href="{% url 'product_detail' fav.product.slug %}" class="prod-name-link">
+                <div class="prod-name">{{ fav.product.name|truncatechars:40 }}</div>
+            </a>
+            <div class="prod-pricing">
+                <span class="price-now">₹{{ fav.product.price }}</span>
+            </div>
+            <div class="prod-stars">★★★★★</div>
+
+            <!-- Remove from favourites button -->
+            <button onclick="removeFavourite(this, {{ fav.product.id }})" class="remove-fav-btn">
+        ❌ Remove from Favourites
+      </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-favourites" style="
+      text-align: center;
+      padding: 4rem;
+      background: #fff;
+      border-radius: 12px;
+    ">
+        <i class="fas fa-heart" style="font-size: 4rem; color: #ccc; margin-bottom: 1rem"></i>
+        <h3>No favourites yet!</h3>
+        <p style="color: #666; margin: 1rem 0">
+            Start adding products to your favourites list.
+        </p>
+        <a href="{% url 'shop' %}" class="btn-primary">Start Shopping →</a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .products-grid-custom {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+    }
+    
+    .prod-card {
+        position: relative;
+        background: #fff;
+        border: 1px solid #ebebeb;
+        padding: 1rem;
+        transition: transform 0.3s;
+    }
+    
+    .prod-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    }
+    
+    .prod-image {
+        width: 100%;
+        height: 290px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .prod-link {
+        display: block;
+        overflow: hidden;
+    }
+    
+    .prod-link:hover .prod-image {
+        transform: scale(1.05);
+    }
+    
+    .prod-name-link {
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    .prod-name-link:hover .prod-name {
+        color: #c8a96a;
+    }
+    
+    .add-to-cart-btn {
+        width: 100%;
+        height: 38px;
+        background: #1a1a1a;
+        color: #fff;
+        border: none;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+        border-radius: 4px;
+    }
+    
+    .add-to-cart-btn:hover {
+        background: #c8a96a;
+    }
+    
+    .prod-quick {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.97);
+        transform: translateY(100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .prod-card:hover .prod-quick {
+        transform: translateY(0);
+    }
+    
+    .prod-cat-label {
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        color: #bbb;
+        margin-bottom: 5px;
+        margin-top: 12px;
+    }
+    
+    .prod-name {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 7px;
+        line-height: 1.4;
+    }
+    
+    .prod-pricing {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
+    
+    .price-now {
+        font-size: 16px;
+        font-weight: 700;
+        color: #c8a96a;
+    }
+    
+    .prod-stars {
+        font-size: 12px;
+        color: #c8a96a;
+        margin-top: 4px;
+        letter-spacing: 1px;
+    }
+    
+    .remove-fav-btn {
+        width: 100%;
+        margin-top: 10px;
+        padding: 8px;
+        background: #fff;
+        border: 1px solid #dc3545;
+        color: #dc3545;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .remove-fav-btn:hover {
+        background: #dc3545;
+        color: #fff;
+    }
+    
+    @media (max-width: 1024px) {
+        .products-grid-custom {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .products-grid-custom {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script>
+    function getCookieValue(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === name + "=") {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function showToastMsg(message) {
+        const toast = document.createElement("div");
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1a1a1a;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            z-index: 1000;
+            animation: fadeInOut 2s ease;
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+    }
+
+    function removeFavourite(btn, productId) {
+        fetch(`/accounts/toggle-favourite/${productId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCookieValue("csrftoken"),
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    showToastMsg("Removed from favourites 💔");
+                    // Remove the card from UI
+                    btn.closest(".prod-card").remove();
+                    // Check if no products left
+                    if (document.querySelectorAll(".prod-card").length === 0) {
+                        location.reload();
+                    }
+                }
+            })
+            .catch((error) => console.error("Error:", error));
+    }
+
+    // Add fadeInOut animation style if not exists
+    if (!document.querySelector("#fav-style")) {
+        const style = document.createElement("style");
+        style.id = "fav-style";
+        style.textContent = `
+            @keyframes fadeInOut {
+                0% { opacity: 0; transform: translateX(100px); }
+                15% { opacity: 1; transform: translateX(0); }
+                85% { opacity: 1; transform: translateX(0); }
+                100% { opacity: 0; transform: translateX(100px); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+</script>
+
+{% endblock %}
